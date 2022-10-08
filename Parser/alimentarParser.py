@@ -33,7 +33,7 @@ PRODUCCIONES = {
     "EXPRESION":[["TERMINO", "EXPRESION2"], ['TERMINO']],
     "EXPRESION2":[["+", "TERMINO", "EXPRESION2"], ["+", "TERMINO"]],
     "TERMINO":[["FACTOR", "TERMINO2"]],
-    "TERMINO2":[["*", "FACTOR", "TERMINO2"], ["@"]],
+    "TERMINO2":[["*", "FACTOR", "TERMINO2"], ["*", "FACTOR"]],
     "FACTOR":[["(", "EXPRESION", ")"], ["VALOR"]]
 }
 
