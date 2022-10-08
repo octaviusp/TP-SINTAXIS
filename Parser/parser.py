@@ -1,36 +1,56 @@
-PRODUCCIONES = {
-    
-    # diccionario, mapa key:value
-    # las keys son los NO TERMINALES
-    # los values Minuscula son TERMINALES,
-    # en Mayuscula son NO TERMINALES osea las keys!
-    
-    # Las producciones que tenian lambda se reemplazan como si fueran un espacio vacio
-    # por lo que
-    # Program -> Estructura Program | lambda
-    # quedaria =>     'PROGRAM':[['ESTRUCTURA', 'Program'], ['ESTRUCTURA']]
-    # es decir el segundo elemento es como ESTRUCTURA LAMBDA, pero tomamos a lambda como vacio. y queda solo ESTRUCTURA.
-    
-    'PROGRAM':[['ESTRUCTURA', 'Program'], ['ESTRUCTURA']],
-    'ESTRUCTURA':[["mientras", "id", "esMenorQue","Valor","hacer","op", "Program", "clp"], ["si", "Expresion", "entonces", "op", "PROGRAM", "clp", "sino", "op"], ["PROGRAM", "clp"], ["mostrar", "EXPRESION"], ["aceptar", "id"], ["id", "eq", "EXPRESION"]],
-    'VALOR':[["id"], ["num"]],
-    "EXPRESION":[["TERMINO", "EXPRESION2"], ['TERMINO']],
-    "EXPRESION2":[["+", "TERMINO", "EXPRESION2"], ["+", "TERMINO"]],
-    "TERMINO":[["FACTOR", "TERMINO2"]],
-    "TERMINO2":[["*", "FACTOR", "TERMINO2"], ["@"]],
-    "FACTOR":[["(", "EXPRESION", ")"], ["VALOR"]]
-}
-
 class Parser:
 
     # creamos una clase Parser donde va a contener como atributos
     # donde Hernán tiene el diccionario de parser
-    def __init__(self, producciones, tokens_posibles):
+    def __init__(self, producciones, tokens_posibles, terminales, noTerminales):
         self.producciones = producciones
         self.tokens = tokens_posibles
         self.posicion_indice = 0
         self.error = False
+        self.Terminales = terminales
+        self.noTerminales = noTerminales
 
-    def parsear(lista_tokens) -> Boolean:
-        pass
+    def parsear(lista_tokens) -> bool:
+        return True
 
+    def cambiarError(self):
+        self.error = True if not self.error else False
+
+    def tokenActual(self):
+        return self.tokens[self.posicion_indice][0]
+
+    def principal(self) -> bool:
+        # Si esta funcion devuelve False
+        # significa que la cadena NO pertenece
+        # si es TRUE , SI pertenece
+        self.pni('PROGRAM')
+        return not ((self.tokenActual != 'eof') or self.error)
+    
+    def pni(self, no_terminal):
+        for ladoDerecho in PRODUCCIONES[no_terminal]:
+            # snapshoteamos la posicion para guardarla
+            # por si algo sale mal
+            pos_a_retroceder = self.posicion_indice
+            # procesamos el lado derecho ed las producciones
+            self.procesar(ladoDerecho)
+            # si sale mal, volvemos al snapshop
+            if self.error:
+                self.posicion_indice = pos_a_retroceder
+            else:
+                # caso contrario nada salio mal, salimos del ciclo
+                break
+    
+    def procesar(self, ladoDerecho):
+        for simbolo in ladoDerecho:
+            self.error = False
+            if simbolo in self.Terminales:
+                if simbolo == self.tokenActual:
+                    self.posicion_indice += 1
+                else:
+                    self.cambiarError()
+                    break
+            
+            elif simbolo in self.noTerminales:
+                self.pni(simbolo)
+                if self.error:
+                    break
