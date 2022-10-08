@@ -1,7 +1,3 @@
-from math import prod
-from xmlrpc.client import Boolean
-
-
 PRODUCCIONES = {
     
     # diccionario, mapa key:value
